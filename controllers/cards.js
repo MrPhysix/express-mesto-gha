@@ -50,7 +50,7 @@ async function createCard(req, res) {
 
 async function removeCard(req, res) {
   try {
-    const card = awaitCard.findByIdAndRemove(req.params.cardId);
+    const card = await Card.findByIdAndRemove(req.params.cardId);
     res.send(card);
   } catch (err) {
     errorHandler(res, err);

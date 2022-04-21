@@ -5,7 +5,7 @@ function errorHandler(res, err, linked) {
     case 'ValidationError': {
       ERROR_CODE = 400;
       res.status(ERROR_CODE).send({
-        message: `${Object.values(err.errors).map((err) => `Ошибка в поле "${err.path}" : ${err.message}`).join('\n ')}`,
+        message: `${Object.values(err.errors).map(() => `Ошибка в поле "${err.path}" : ${err.message}`).join('\n ')}`,
       });
       break;
     }
