@@ -25,4 +25,4 @@ jobs:
     - name: Get testing lib
       run: set -eu && git clone https://github.com/Yandex-Practicum/web-autotest-public.git
     - name: Run test sprint 13
-      run: bash ./web-autotest-public/run13.sh
+      run: bash ./web-autotest-public/proj13/bin/test-config.sh
