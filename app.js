@@ -25,7 +25,7 @@ app.use((req, res) => {
   res.status(404).send({ message: `Путь запроса ${req.path} не найден` });
 });
 
-(async function () {
+(async function main() {
   try {
     await mongoose.connect('mongodb://localhost:27017/mestodb');
     console.log(`Connected to Mongo! Database name: ${mongoose.connections[0].name}`);
