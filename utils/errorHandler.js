@@ -9,6 +9,7 @@ function errorHandler(res, err, linked) {
       });
       break;
     }
+
     case 'CastError': {
       ERROR_CODE = 400;
       res.status(ERROR_CODE).send({

@@ -18,16 +18,12 @@ async function dislikeCard(req, res) {
 // });
 
 async function likeCard(req, res) {
-  try {
-    const card = await Card.findByIdAndUpdate(
-      req.params.cardId,
-      { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
-      { new: true },
-    );
-    res.send(card);
-  } catch (err) {
-    errorHandler(res, err);
-  }
+  const card = await Card.findByIdAndUpdate(
+    req.params.cardId,
+    { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
+    { new: true },
+  ).orFail(() => res.send({ 1: 1 }));
+  res.send(card);
 }
 
 async function getCards(req, res) {
