@@ -10,9 +10,9 @@ function errorHandler(res, err, linked) {
       break;
     }
     case 'CastError': {
-      ERROR_CODE = 404;
+      ERROR_CODE = 400;
       res.status(ERROR_CODE).send({
-        message: `${linked === 'user' ? 'Пользователь' : 'Карточка'}`.concat(` с id: ${err.value} не найден`),
+        message: `${linked === 'user' ? 'Пользователь' : 'Карточка'}`.concat(` с некорректным id: ${err.value}`),
       });
       break;
     }

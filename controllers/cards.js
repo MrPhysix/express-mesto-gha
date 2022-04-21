@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const Card = require('../models/card');
 const errorHandler = require('../utils/errorHandler');
 
@@ -13,6 +14,9 @@ async function dislikeCard(req, res) {
     errorHandler(res, err);
   }
 }
+// .orFail(() => {
+//   throw new Error('NotFound');
+// });
 
 async function likeCard(req, res) {
   try {

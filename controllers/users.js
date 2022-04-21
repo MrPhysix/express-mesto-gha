@@ -23,7 +23,7 @@ async function updateUserAvatar(req, res) {
     const user = await User.findByIdAndUpdate(req.user._id, { avatar: req.body.avatar }, {
       new: true,
       runValidators: true, // данные будут валидированы перед изменением (??)
-      upsert: true,
+      upsert: false,
     });
     res.send(user);
   } catch (err) {
