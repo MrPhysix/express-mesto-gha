@@ -7,23 +7,25 @@ async function dislikeCard(req, res) {
       req.params.cardId,
       { $pull: { likes: req.user._id } }, // добавить _id в массив, если его там нет
       { new: true },
-    );
+    ).orFail((err) => err); // вот это я придумал ))
     res.send(card);
   } catch (err) {
     errorHandler(res, err);
   }
 }
-// .orFail(() => {
-//   throw new Error('NotFound');
-// });
 
+// 62628694cf729ca7a27856ec
 async function likeCard(req, res) {
-  const card = await Card.findByIdAndUpdate(
-    req.params.cardId,
-    { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
-    { new: true },
-  ).orFail(() => res.send({ 1: 1 }));
-  res.send(card);
+  try {
+    const card = await Card.findByIdAndUpdate(
+      req.params.cardId,
+      { $addToSet: { likes: req.user._id } },
+      { new: true },
+    ).orFail((err) => err);
+    res.send(card);
+  } catch (err) {
+    errorHandler(res, err);
+  }
 }
 
 async function getCards(req, res) {
@@ -49,7 +51,7 @@ async function createCard(req, res) {
 
 async function removeCard(req, res) {
   try {
-    const card = await Card.findByIdAndRemove(req.params.cardId);
+    const card = await Card.findByIdAndRemove(req.params.cardId).orFail((err) => err);
     res.send(card);
   } catch (err) {
     errorHandler(res, err);

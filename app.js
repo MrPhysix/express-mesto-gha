@@ -22,7 +22,7 @@ app.use((req, res, next) => {
 app.use('/users', userRoutes);
 app.use('/cards', cardRoutes);
 app.use((req, res) => {
-  res.status(404).send({ message: `Путь запроса ${req.path} не найден` });
+  res.status(404).send({ message: `Путь ${req.method} запроса ${req.path} не найден ` });
 });
 
 (async function main() {

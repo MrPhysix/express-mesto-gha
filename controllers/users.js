@@ -42,7 +42,7 @@ async function getUsers(req, res) {
 
 async function getUserById(req, res) {
   try {
-    const user = await User.findById(req.params.userId);
+    const user = await User.findById(req.params.userId).orFail((err) => err);
     res.send(user);
   } catch (err) {
     errorHandler(res, err, 'user');

@@ -10,10 +10,10 @@ function errorHandler(res, err, linked) {
       break;
     }
 
-    case 'CastError': {
-      ERROR_CODE = 400;
+    case 'DocumentNotFoundError': {
+      ERROR_CODE = 404;
       res.status(ERROR_CODE).send({
-        message: `${linked === 'user' ? 'Пользователь' : 'Карточка'}`.concat(` с некорректным id: ${err.value}`),
+        message: `${linked === 'user' ? 'Пользователь' : 'Карточка'}`.concat(' с таким id не найден', `${linked !== 'user' ? 'a' : ''}`),
       });
       break;
     }
