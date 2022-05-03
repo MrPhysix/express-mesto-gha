@@ -7,7 +7,7 @@ module.exports = (req, res, next) => {
 
   if (!authorization || !authorization.startsWith('Bearer ')) {
     const err = new Error('Необходима авторизация');
-    err.statusCode = 401;
+    err.statusCode = 400;
 
     next(err);
   }

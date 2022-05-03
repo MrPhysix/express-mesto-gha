@@ -34,10 +34,10 @@ app.post('/signup', celebrate({
   }),
 }), createUser);
 
-app.use(auth);
+// app.use(auth);
 
-app.use('/users', userRoutes);
-app.use('/cards', cardRoutes);
+app.use('/users', auth, userRoutes);
+app.use('/cards', auth, cardRoutes);
 app.use((req, res) => {
   res.status(404).send({ message: `Путь ${req.method} запроса ${req.path} не найден ` });
 });

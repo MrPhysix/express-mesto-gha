@@ -56,7 +56,7 @@ async function removeCard(req, res) {
     card = await Card.findById(req.params.cardId).orFail((err) => err);
     const ownerId = card.owner.toString();
     if (ownerId !== userId) {
-      res.status(401).send({
+      res.status(403).send({
         message: 'Вы не можете удалить чужую карточку',
       });
       return;

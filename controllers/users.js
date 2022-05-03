@@ -65,7 +65,7 @@ async function createUser(req, res) {
       email, password: hashedPassword, name, about, avatar,
     });
     res.status(200).send({
-      _id: user.id,
+      _id: user._id,
       email: user.email,
       name: user.name,
       about: user.about,
