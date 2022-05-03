@@ -29,7 +29,7 @@ app.post('/signup', celebrate({
     email: Joi.string().required().email(),
     password: Joi.string().required(),
     name: Joi.string().min(2).max(30),
-    about: Joi.string().min(2).max(30),
+    about: Joi.string().min(2).max(30).uri(),
     avatar: Joi.string().uri(),
   }),
 }), createUser);
