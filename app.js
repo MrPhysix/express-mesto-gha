@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
 
 const {
   errors,
@@ -34,10 +35,11 @@ app.post('/signup', celebrate({
   }),
 }), createUser);
 
-// app.use(auth);
+app.use(cookieParser());
+app.use(auth);
 
-app.use('/users', auth, userRoutes);
-app.use('/cards', auth, cardRoutes);
+app.use('/users', userRoutes);
+app.use('/cards', cardRoutes);
 app.use((req, res) => {
   res.status(404).send({ message: `Путь ${req.method} запроса ${req.path} не найден ` });
 });

@@ -65,11 +65,11 @@ async function createUser(req, res) {
       email, password: hashedPassword, name, about, avatar,
     });
     res.status(200).send({
-      _id: user._id,
       email: user.email,
       name: user.name,
       about: user.about,
       avatar: user.avatar,
+      _id: user._id,
     });
   } catch (err) {
     errorHandler(res, err, 'user');
@@ -81,7 +81,11 @@ async function login(req, res) {
   try {
     const user = await User.findUserByCredentials(email, password);
     const token = getJwt(user);
-    res.status(200).send({ token });
+    // res.status(200).send({ token });
+    res.cookie('jwt', token, {
+      maxAge: 3600000 * 24 * 7,
+      httpOnly: true,
+    }).send({ token });
   } catch (err) {
     errorHandler(res, err, 'user');
   }

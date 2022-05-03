@@ -1,28 +1,25 @@
 const { verifyJwt } = require('../utils/jwt');
 
-const extractBearerToken = (header) => header.replace('Bearer ', '');
-
 module.exports = (req, res, next) => {
-  const { authorization } = req.headers;
-
-  if (!authorization || !authorization.startsWith('Bearer ')) {
+  // const { authorization } = req.headers;
+  const { jwt } = req.cookies;
+  console.log(jwt);
+  if (!jwt) {
     const err = new Error('Необходима авторизация');
-    err.statusCode = 400;
+    err.statusCode = 401;
 
     next(err);
   }
 
-  const token = extractBearerToken(authorization);
-
   let payload;
   try {
-    payload = verifyJwt(token);
+    payload = verifyJwt(jwt);
   } catch (e) {
     const err = new Error('Необходима авторизация (некоректный токен)');
     err.statusCode = 401;
 
     next(err);
   }
-  req.user = payload; // объект запроса ? а как в header ?
+  req.user = payload;
   next();
 };
