@@ -40,10 +40,13 @@ app.use(auth);
 
 app.use('/users', userRoutes);
 app.use('/cards', cardRoutes);
+
+app.use(errors());
+
 app.use((req, res) => {
   res.status(404).send({ message: `Путь ${req.method} запроса ${req.path} не найден ` });
 });
-app.use(errors());
+
 app.use((err, req, res, next) => {
   res.status(err.statusCode).send({ message: err.message });
   next();
