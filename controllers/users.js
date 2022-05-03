@@ -64,7 +64,13 @@ async function createUser(req, res) {
     const user = await User.create({
       email, password: hashedPassword, name, about, avatar,
     });
-    res.send(user);
+    res.send({
+      _id: user.id,
+      email: user.email,
+      name: user.name,
+      about: user.about,
+      avatar: user.avatar,
+    });
   } catch (err) {
     errorHandler(res, err, 'user');
   }
