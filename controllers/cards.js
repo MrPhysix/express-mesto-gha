@@ -50,8 +50,18 @@ async function createCard(req, res) {
 }
 
 async function removeCard(req, res) {
+  const userId = req.user._id;
+  let card;
   try {
-    const card = await Card.findByIdAndRemove(req.params.cardId).orFail((err) => err);
+    card = await Card.findById(req.params.cardId).orFail((err) => err);
+    const ownerId = card.owner.toString();
+    if (ownerId !== userId) {
+      res.status(401).send({
+        message: 'Вы не можете удалить чужую карточку',
+      });
+      return;
+    }
+    card = await Card.findByIdAndRemove(req.params.cardId).orFail((err) => err);
     res.send(card);
   } catch (err) {
     errorHandler(res, err);

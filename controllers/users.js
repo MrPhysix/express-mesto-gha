@@ -1,4 +1,9 @@
+const bcrypt = require('bcryptjs');
 const User = require('../models/user');
+const {
+  getJwt,
+} = require('../utils/jwt');
+
 const errorHandler = require('../utils/errorHandler');
 
 async function updateUser(req, res) {
@@ -9,7 +14,7 @@ async function updateUser(req, res) {
       { name, about },
       {
         new: true,
-        runValidators: true, // данные будут валидированы перед изменением (??)
+        runValidators: true,
       },
     );
     res.send(user);
@@ -22,7 +27,7 @@ async function updateUserAvatar(req, res) {
   try {
     const user = await User.findByIdAndUpdate(req.user._id, { avatar: req.body.avatar }, {
       new: true,
-      runValidators: true, // данные будут валидированы перед изменением (??)
+      runValidators: true,
       upsert: false,
     });
     res.send(user);
@@ -50,10 +55,34 @@ async function getUserById(req, res) {
 }
 
 async function createUser(req, res) {
-  const { name, about, avatar } = req.body;
+  const {
+    email, password, name, about, avatar,
+  } = req.body;
 
   try {
-    const user = await User.create({ name, about, avatar });
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const user = await User.create({
+      email, password: hashedPassword, name, about, avatar,
+    });
+    res.send(user);
+  } catch (err) {
+    errorHandler(res, err, 'user');
+  }
+}
+
+async function login(req, res) {
+  const { email, password } = req.body;
+  try {
+    const user = await User.findUserByCredentials(email, password);
+    const token = getJwt(user);
+    res.send({ token });
+  } catch (err) {
+    errorHandler(res, err, 'user');
+  }
+}
+async function getCurrentUserInfo(req, res) {
+  try {
+    const user = await User.findById(req.user).orFail((err) => err);
     res.send(user);
   } catch (err) {
     errorHandler(res, err, 'user');
@@ -63,7 +92,9 @@ async function createUser(req, res) {
 module.exports = {
   getUsers,
   getUserById,
-  createUser,
   updateUser,
   updateUserAvatar,
+  createUser,
+  login,
+  getCurrentUserInfo,
 };
