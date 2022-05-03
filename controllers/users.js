@@ -17,7 +17,7 @@ async function updateUser(req, res) {
         runValidators: true,
       },
     );
-    res.send(user);
+    res.status(200).send(user);
   } catch (err) {
     errorHandler(res, err, 'user');
   }
@@ -30,7 +30,7 @@ async function updateUserAvatar(req, res) {
       runValidators: true,
       upsert: false,
     });
-    res.send(user);
+    res.status(200).send(user);
   } catch (err) {
     errorHandler(res, err, 'user');
   }
@@ -39,7 +39,7 @@ async function updateUserAvatar(req, res) {
 async function getUsers(req, res) {
   try {
     const user = await User.find({});
-    res.send(user);
+    res.status(200).send(user);
   } catch (err) {
     errorHandler(res, err, 'user');
   }
@@ -48,7 +48,7 @@ async function getUsers(req, res) {
 async function getUserById(req, res) {
   try {
     const user = await User.findById(req.params.userId).orFail((err) => err);
-    res.send(user);
+    res.status(200).send(user);
   } catch (err) {
     errorHandler(res, err, 'user');
   }
@@ -64,7 +64,7 @@ async function createUser(req, res) {
     const user = await User.create({
       email, password: hashedPassword, name, about, avatar,
     });
-    res.send({
+    res.status(200).send({
       _id: user.id,
       email: user.email,
       name: user.name,
@@ -81,7 +81,7 @@ async function login(req, res) {
   try {
     const user = await User.findUserByCredentials(email, password);
     const token = getJwt(user);
-    res.send({ token });
+    res.status(200).send({ token });
   } catch (err) {
     errorHandler(res, err, 'user');
   }
@@ -89,7 +89,7 @@ async function login(req, res) {
 async function getCurrentUserInfo(req, res) {
   try {
     const user = await User.findById(req.user).orFail((err) => err);
-    res.send(user);
+    res.status(200).send(user);
   } catch (err) {
     errorHandler(res, err, 'user');
   }
