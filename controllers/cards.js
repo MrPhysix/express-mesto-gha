@@ -1,43 +1,57 @@
 const Card = require('../models/card');
-const errorHandler = require('../utils/errorHandler');
 
-async function dislikeCard(req, res) {
+const NotFoundError = require('../errors/NotFoundError');
+const ValidationError = require('../errors/ValidationError');
+const AccessError = require('../errors/AccessError');
+
+async function dislikeCard(req, res, next) {
   try {
     const card = await Card.findByIdAndUpdate(
       req.params.cardId,
-      { $pull: { likes: req.user._id } }, // добавить _id в массив, если его там нет
+      { $pull: { likes: req.user._id } },
       { new: true },
-    ).orFail((err) => err); // вот это я придумал ))
+    );
+    if (!card) {
+      throw new NotFoundError('Такой карточки нет');
+    }
     res.send(card);
   } catch (err) {
-    errorHandler(res, err);
+    if (err.kind === 'ObjectId') {
+      next(new ValidationError('Невалидный [id]'));
+    } else next(err);
   }
 }
 
 // 62628694cf729ca7a27856ec
-async function likeCard(req, res) {
+// .orFail((err) => err);
+async function likeCard(req, res, next) {
   try {
     const card = await Card.findByIdAndUpdate(
       req.params.cardId,
       { $addToSet: { likes: req.user._id } },
       { new: true },
-    ).orFail((err) => err);
+    );
+    if (!card) {
+      throw new NotFoundError('Такой карточки нет');
+    }
     res.send(card);
   } catch (err) {
-    errorHandler(res, err);
+    if (err.kind === 'ObjectId') {
+      next(new ValidationError('Невалидный [id]'));
+    } else next(err);
   }
 }
 
-async function getCards(req, res) {
+async function getCards(req, res, next) {
   try {
     const card = await Card.find({});
     res.send(card);
   } catch (err) {
-    errorHandler(res, err);
+    next(err);
   }
 }
 
-async function createCard(req, res) {
+async function createCard(req, res, next) {
   const { name, link } = req.body;
   const owner = req.user._id;
 
@@ -45,26 +59,28 @@ async function createCard(req, res) {
     const card = await Card.create({ name, link, owner });
     res.send(card);
   } catch (err) {
-    errorHandler(res, err);
+    next(err);
   }
 }
 
-async function removeCard(req, res) {
+async function removeCard(req, res, next) {
   const userId = req.user._id;
   let card;
   try {
-    card = await Card.findById(req.params.cardId).orFail((err) => err);
+    card = await Card.findById(req.params.cardId);
+    if (!card) {
+      throw new NotFoundError('Такой карточки нет');
+    }
     const ownerId = card.owner.toString();
     if (ownerId !== userId) {
-      res.status(403).send({
-        message: 'Вы не можете удалить чужую карточку',
-      });
-      return;
+      throw new AccessError('Вы не можете удалить чужую карточку');
     }
-    card = await Card.findByIdAndRemove(req.params.cardId).orFail((err) => err);
+    card = await Card.findByIdAndRemove(req.params.cardId);
     res.send(card);
   } catch (err) {
-    errorHandler(res, err);
+    if (err.kind === 'ObjectId') {
+      next(new ValidationError('Невалидный [id]'));
+    } else next(err);
   }
 }
 

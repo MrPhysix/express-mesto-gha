@@ -3,10 +3,12 @@ const User = require('../models/user');
 const {
   getJwt,
 } = require('../utils/jwt');
+const NotFoundError = require('../errors/NotFoundError');
+const ValidationError = require('../errors/ValidationError');
+const RegisteredEmailError = require('../errors/RegisteredEmailError');
+const LoginError = require('../errors/LoginError');
 
-const errorHandler = require('../utils/errorHandler');
-
-async function updateUser(req, res) {
+async function updateUser(req, res, next) {
   const { name, about } = req.body;
   try {
     const user = await User.findByIdAndUpdate(
@@ -16,45 +18,56 @@ async function updateUser(req, res) {
         new: true,
         runValidators: true,
       },
-    ).orFail((err) => err); // может везде так)
+    );
+    if (!user) {
+      throw new NotFoundError('Пользователь не найден');
+    }
     res.status(200).send(user);
   } catch (err) {
-    errorHandler(res, err, 'user');
+    next(err);
   }
 }
 
-async function updateUserAvatar(req, res) {
+async function updateUserAvatar(req, res, next) {
   try {
     const user = await User.findByIdAndUpdate(req.user._id, { avatar: req.body.avatar }, {
       new: true,
       runValidators: true,
       upsert: false,
-    }).orFail((err) => err);
+    });
+    if (!user) {
+      throw new NotFoundError('Пользователь не найден');
+    }
     res.status(200).send(user);
   } catch (err) {
-    errorHandler(res, err, 'user');
+    next(err);
   }
 }
 
-async function getUsers(req, res) {
+async function getUsers(req, res, next) {
   try {
     const user = await User.find({});
     res.status(200).send(user);
   } catch (err) {
-    errorHandler(res, err, 'user');
+    next(err);
   }
 }
 
-async function getUserById(req, res) {
+async function getUserById(req, res, next) {
   try {
-    const user = await User.findById(req.params.userId).orFail((err) => err);
+    const user = await User.findById(req.params.userId);
+    if (!user) {
+      throw new NotFoundError('Пользователь не найден');
+    }
     res.status(200).send(user);
   } catch (err) {
-    errorHandler(res, err, 'user');
+    if (err.kind === 'ObjectId') {
+      throw new ValidationError('Невалидный [id]');
+    } else next(err);
   }
 }
 
-async function createUser(req, res) {
+async function createUser(req, res, next) {
   const {
     email, password, name, about, avatar,
   } = req.body;
@@ -72,30 +85,42 @@ async function createUser(req, res) {
       _id: user._id,
     });
   } catch (err) {
-    errorHandler(res, err, 'user');
+    if (err.code === 11000) {
+      next(new RegisteredEmailError('Указанный Email уже зарегистрирован'));
+    } else next(err);
   }
 }
 
-async function login(req, res) {
+async function login(req, res, next) {
   const { email, password } = req.body;
   try {
     const user = await User.findUserByCredentials(email, password);
+    if (!user) {
+      throw new NotFoundError('Пользователь не найден');
+    }
     const token = getJwt(user);
-    // res.status(200).send({ token });
+    if (!token) {
+      throw new LoginError('Пользователь не найден [token]');
+    }
     res.cookie('jwt', token, {
       maxAge: 3600000 * 24 * 7,
       httpOnly: true,
     }).send({ token });
   } catch (err) {
-    errorHandler(res, err, 'user');
+    if (err.kind === 'ObjectId') {
+      throw new ValidationError('Невалидный [id]');
+    } else next(err);
   }
 }
-async function getCurrentUserInfo(req, res) {
+async function getCurrentUserInfo(req, res, next) {
   try {
-    const user = await User.findById(req.user).orFail((err) => err);
+    const user = await User.findById(req.user);
+    if (!user) {
+      throw new NotFoundError('Пользователь не найден');
+    }
     res.status(200).send(user);
   } catch (err) {
-    errorHandler(res, err, 'user');
+    next(err);
   }
 }
 
