@@ -16,7 +16,7 @@ async function updateUser(req, res) {
         new: true,
         runValidators: true,
       },
-    );
+    ).orFail((err) => err); // может везде так)
     res.status(200).send(user);
   } catch (err) {
     errorHandler(res, err, 'user');
@@ -29,7 +29,7 @@ async function updateUserAvatar(req, res) {
       new: true,
       runValidators: true,
       upsert: false,
-    });
+    }).orFail((err) => err);
     res.status(200).send(user);
   } catch (err) {
     errorHandler(res, err, 'user');

@@ -30,7 +30,7 @@ app.post('/signup', celebrate({
     email: Joi.string().required().email(),
     password: Joi.string().required(),
     name: Joi.string().min(2).max(30),
-    about: Joi.string().min(2).max(30).uri(),
+    about: Joi.string().min(2).max(30),
     avatar: Joi.string().uri(),
   }),
 }), createUser);
@@ -47,9 +47,15 @@ app.use((req, res) => {
   res.status(404).send({ message: `Путь ${req.method} запроса ${req.path} не найден ` });
 });
 
-app.use((err, req, res, next) => {
-  res.status(err.statusCode).send({ message: err.message });
-  next();
+app.use((err, req, res) => {
+  const { statusCode = 500, message } = err;
+  res
+    .status(statusCode)
+    .send({
+      message: statusCode === 500
+        ? `Произошла ошибка сервера — ${err}`
+        : message,
+    });
 });
 
 (async function main() {
