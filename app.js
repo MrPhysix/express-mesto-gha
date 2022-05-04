@@ -43,9 +43,9 @@ app.use('/cards', cardRoutes);
 
 app.use(errors());
 
-app.use((req, res) => {
-  res.status(404).send({ message: `Путь ${req.method} запроса ${req.path} не найден ` });
-});
+// app.use((req, res) => {
+//   res.status(404).send({ message: `Путь ${req.method} запроса ${req.path} не найден ` });
+// });
 
 app.use((err, req, res) => {
   const { statusCode = 500, message } = err;

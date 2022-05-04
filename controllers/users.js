@@ -62,7 +62,7 @@ async function getUserById(req, res, next) {
     res.status(200).send(user);
   } catch (err) {
     if (err.kind === 'ObjectId') {
-      throw new ValidationError('Невалидный [id]');
+      next(ValidationError('Невалидный [id]'));
     } else next(err);
   }
 }
@@ -108,7 +108,9 @@ async function login(req, res, next) {
     }).send({ token });
   } catch (err) {
     if (err.kind === 'ObjectId') {
-      throw new ValidationError('Невалидный [id]');
+      next(new ValidationError('Невалидный [id]'));
+    } else if (err.name === 'LoginError') {
+      next(new LoginError('Пользователь не найден'));
     } else next(err);
   }
 }
