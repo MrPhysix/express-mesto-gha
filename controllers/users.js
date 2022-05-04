@@ -87,6 +87,9 @@ async function createUser(req, res, next) {
   } catch (err) {
     if (err.code === 11000) {
       next(new RegisteredEmailError('Указанный Email уже зарегистрирован'));
+    }
+    if (err.name === 'ValidationError') {
+      next(new ValidationError(err.message));
     } else next(err);
   }
 }
@@ -96,7 +99,7 @@ async function login(req, res, next) {
   try {
     const user = await User.findUserByCredentials(email, password);
     if (!user) {
-      throw new NotFoundError('Пользователь не найден');
+      throw new LoginError('Пользователь не найден');
     }
     const token = getJwt(user);
     if (!token) {
@@ -110,7 +113,7 @@ async function login(req, res, next) {
     if (err.kind === 'ObjectId') {
       next(new ValidationError('Невалидный [id]'));
     } else if (err.name === 'LoginError') {
-      next(new LoginError('Пользователь не найден'));
+      next(new LoginError('Неверный email или пароль'));
     } else next(err);
   }
 }

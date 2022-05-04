@@ -1,23 +1,18 @@
 const { verifyJwt } = require('../utils/jwt');
+const LoginError = require('../errors/LoginError');
 
 module.exports = (req, res, next) => {
   // const { authorization } = req.headers;
   const { jwt } = req.cookies;
   if (!jwt) {
-    const err = new Error('Необходима авторизация');
-    err.statusCode = 401;
-
-    next(err);
+    throw new LoginError('Необходима авторизация');
   }
 
   let payload;
   try {
     payload = verifyJwt(jwt);
-  } catch (e) {
-    const err = new Error('Необходима авторизация (некоректный токен)');
-    err.statusCode = 401;
-
-    next(err);
+  } catch (err) {
+    next(new LoginError('Необходима авторизация [token]'));
   }
   req.user = payload;
   next();

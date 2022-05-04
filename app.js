@@ -2,11 +2,12 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
-
 const {
   errors,
   celebrate, Joi,
 } = require('celebrate');
+const NotFoundError = require('./errors/NotFoundError');
+
 const userRoutes = require('./routes/users');
 const cardRoutes = require('./routes/cards');
 const { login, createUser } = require('./controllers/users');
@@ -43,11 +44,11 @@ app.use('/cards', cardRoutes);
 
 app.use(errors());
 
-// app.use((req, res) => {
-//   res.status(404).send({ message: `Путь ${req.method} запроса ${req.path} не найден ` });
-// });
+app.use((req, res, next) => {
+  next(new NotFoundError(`Путь ${req.method} запроса ${req.path} не найден `));
+});
 
-app.use((err, req, res) => {
+app.use((err, req, res, next) => {
   const { statusCode = 500, message } = err;
   res
     .status(statusCode)
@@ -56,6 +57,7 @@ app.use((err, req, res) => {
         ? `Произошла ошибка сервера — ${err}`
         : message,
     });
+  next();
 });
 
 (async function main() {
