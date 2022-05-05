@@ -16,7 +16,7 @@ async function dislikeCard(req, res, next) {
     }
     res.send(card);
   } catch (err) {
-    if (err.kind === 'ObjectId') {
+    if (err.name === 'CastError') {
       next(new ValidationError('Невалидный [id]'));
     } else next(err);
   }
@@ -36,7 +36,7 @@ async function likeCard(req, res, next) {
     }
     res.send(card);
   } catch (err) {
-    if (err.kind === 'ObjectId') {
+    if (err.name === 'CastError') {
       next(new ValidationError('Невалидный [id]'));
     } else next(err);
   }
@@ -59,7 +59,9 @@ async function createCard(req, res, next) {
     const card = await Card.create({ name, link, owner });
     res.send(card);
   } catch (err) {
-    next(err);
+    if (err.name === 'ValidationError') {
+      next(new ValidationError('Невалидные данные'));
+    } else next(err);
   }
 }
 

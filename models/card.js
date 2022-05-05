@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 
+const URL_REGEX = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})(\/[\w .-]*)*\/?$/gm;
+
 const { ObjectId } = mongoose.Schema.Types;
 
 const cardSchema = new mongoose.Schema(
@@ -14,7 +16,7 @@ const cardSchema = new mongoose.Schema(
       type: String,
       required: true,
       validate: {
-        validator: (data) => /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})(\/[\w .-]*)*\/?$/gm.test(data),
+        validator: (data) => URL_REGEX.test(data),
         // validator: (data) => validator.isURL(data),
         message: 'Некоректный url',
       },

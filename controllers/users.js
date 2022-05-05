@@ -24,7 +24,9 @@ async function updateUser(req, res, next) {
     }
     res.status(200).send(user);
   } catch (err) {
-    next(err);
+    if (err.name === 'ValidationError') {
+      next(new ValidationError('Невалидные данные'));
+    } else next(err);
   }
 }
 
@@ -40,7 +42,9 @@ async function updateUserAvatar(req, res, next) {
     }
     res.status(200).send(user);
   } catch (err) {
-    next(err);
+    if (err.name === 'ValidationError') {
+      next(new ValidationError('Невалидные данные'));
+    } else next(err);
   }
 }
 
@@ -61,8 +65,8 @@ async function getUserById(req, res, next) {
     }
     res.status(200).send(user);
   } catch (err) {
-    if (err.kind === 'ObjectId') {
-      next(ValidationError('Невалидный [id]'));
+    if (err.name === 'CastError') {
+      next(new ValidationError('Невалидный [id]'));
     } else next(err);
   }
 }
@@ -87,8 +91,7 @@ async function createUser(req, res, next) {
   } catch (err) {
     if (err.code === 11000) {
       next(new RegisteredEmailError('Указанный Email уже зарегистрирован'));
-    }
-    if (err.name === 'ValidationError') {
+    } else if (err.name === 'ValidationError') {
       next(new ValidationError(err.message));
     } else next(err);
   }
