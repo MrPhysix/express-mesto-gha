@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const validator = require('validator');
 
-const URL_REGEX = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})(\/[\w .-]*)*\/?$/gm;
+const { URL_REGEX } = require('../utils/regEx');
 
 const userSchema = new mongoose.Schema(
   {

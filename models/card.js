@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
-
-const URL_REGEX = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})(\/[\w .-]*)*\/?$/gm;
+const { URL_REGEX } = require('../utils/regEx');
 
 const { ObjectId } = mongoose.Schema.Types;
 
